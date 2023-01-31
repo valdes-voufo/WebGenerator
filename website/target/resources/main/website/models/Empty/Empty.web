@@ -1,0 +1,41 @@
+website SERWTH {
+
+  navigation {
+    Home;
+    Page1 ;
+    Dropdown {
+     Item1 ;
+     Item2 ;
+    }
+  }
+
+  start page Home {         // start page
+                            // optional title not used
+    content {
+      pic Logo 167 x 40;    // a picture, file: Logo.png (always png) and scaled to size 300x200px)
+      "";        // text
+      -> Page1;             // link to other page
+      "Lorem ipsa";         // more text
+    }
+  }
+
+  page Page1 {
+    "this is page1"  ;    //"title use"
+    content {
+
+    }
+  }
+
+  page Item1 {
+      content {
+
+      }
+    }
+
+  page Item2 {
+      content {
+
+      }
+    }
+
+}

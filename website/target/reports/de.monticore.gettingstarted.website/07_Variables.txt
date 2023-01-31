@@ -1,0 +1,15 @@
+========================================================== Variables assigned
+#Asmt  #Adds  Variable name
+1x     0x     parserHelper
+2x     0x     service
+2x     0x     astHelper
+1x     0x     nameHelper
+2x     0x     cdPrinter
+2x     0x     cd4c
+========================================================== Explanation
+Variables assigned: list all variable names that got a value during the
+process.
+Each entry knows:
+ - #Asmt        how often has a value been assigned (setValue)
+ - #Adds        how often has the value been extended (addValue)
+(EOF)

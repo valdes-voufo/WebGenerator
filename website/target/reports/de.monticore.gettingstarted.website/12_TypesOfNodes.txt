@@ -1,0 +1,57 @@
+======================================== Types of Nodes (all)
+#Objects  #Visits  Nonterminal-Name
+31x       0x       Alt
+15x       0x       Block
+0x        520x     CDAttribute
+0x        126x     CDClass
+0x        76x      CDConstructor
+0x        1x       CDEnum
+0x        84x      CDInterface
+0x        4526x    CDMethod
+0x        83x      CDPackage
+15x       0x       ClassProd
+1x        0x       Constant
+1x        0x       ConstantGroup
+1x        0x       GrammarReference
+2x        0x       InterfaceProd
+1x        9x       MCGrammar
+30x       0x       NonTerminal
+13x       0x       RuleReference
+1x        0x       SymbolDefinition
+44x       0x       Terminal
+======================================== Types of Nodes (With Source Pos)
+#Objects  #Visits  Nonterminal-Name
+31x       0x       Alt
+15x       0x       Block
+0x        2242x    CDMethod
+15x       0x       ClassProd
+1x        0x       Constant
+1x        0x       ConstantGroup
+1x        0x       GrammarReference
+2x        0x       InterfaceProd
+1x        9x       MCGrammar
+30x       0x       NonTerminal
+13x       0x       RuleReference
+1x        0x       SymbolDefinition
+44x       0x       Terminal
+======================================== Types of Nodes (No Source Pos)
+#Objects  #Visits  Nonterminal-Name
+0x        520x     CDAttribute
+0x        126x     CDClass
+0x        76x      CDConstructor
+0x        1x       CDEnum
+0x        84x      CDInterface
+0x        2284x    CDMethod
+0x        83x      CDPackage
+========================================================== Explanation
+Types of Nodes: Shows a List of all AST-Node-Types that occur in the final AST.
+Types of Nodes (with Source Position): Shows the subset of all AST Node Types
+which occurred in the initial AST after the parsing step.
+Types of Nodes (without Source Position): Shows the subset of all AST Node Types
+which have been added to the initial AST after the parsing step (e.g. by model
+transformation).
+For each AST type entry in the lists the following information is reported: 
+ - #Objects:  number of its instances of the corresponding AST type
+ - #Visits:   how often nodes of that type have been visited by a
+ call/includeTemplate
+(EOF)

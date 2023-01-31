@@ -1,0 +1,39 @@
+website Moodle {
+  navigation {
+    Home;
+    Page1;
+    Dropdown {
+      Item1;
+      Item2;
+    }
+
+  }
+  start page Home {
+    content {
+
+      pic Logo 167 x 40;
+      "";
+      -> Page1;
+      "Lorem ipsa";
+    }
+  }
+
+  page Page1 {
+    content {
+
+    }
+  }
+
+  page Item1 {
+    content {
+
+    }
+  }
+
+  page Item2 {
+    content {
+
+    }
+  }
+
+}
