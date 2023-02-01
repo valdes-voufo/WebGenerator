@@ -1,0 +1,122 @@
+/* (c) https://github.com/MontiCore/monticore */
+package com.valdes ;
+
+grammar Website extends de.monticore.literals.MCCommonLiterals {
+
+//************************Website******************************************//
+  /** A ASTWebsite Represent a simple Website with navigation and pages
+      @attribute name Name of the website
+      @attribute navigation Navbar of the website
+      @attribute pages List of pages
+ */
+
+  Website = "website" Name "{"  (Navigation)? (Page)+ "}";
+  interface WebsiteElement ;
+//***********************Navigation****************************************//
+   /** A ASTNavigation Represent the Navbar of the website
+        @attribute navigationsItems the list of navigations' items
+  */
+
+  Navigation implements WebsiteElement = "navigation" "{" (NavigationItem)+ "}" ;
+
+//*********************NavigationsItems************************************//
+  /** A ASTNavigationItem represent an Item in a navbar
+      @attribute name Name of the navigationItem
+      @attribute subNavigationItem the list of SubItems
+      @attribute pages List of pages
+ */
+
+  NavigationItem implements WebsiteElement = Name  (";"| ("{"  (subItem:NavigationItem)+   "}"));
+
+//*********************Page*********************************************//
+   /** A ASTPage represent a page in a website
+        @attribute name Name of the page
+        @attribute title optional title of the page
+        @attribute content Content of the  page
+  */
+  symbol Page implements WebsiteElement = (start:["start"])? "page" Name  "{" (title:String ";")? PageContent "}";
+
+//*********************PageContent*****************************************//
+  /** A ASTPageContent represent a page in a website
+          @attribute pictures list of pictures
+          @attribute texts list of texts
+          @attribute links list of links
+  */
+  interface PageContentElement ;
+
+  PageContent = "content" "{" PageContentElement* "}" ;
+
+//*********************Link*******************************************//
+  /** A ASTLink represent a link in a website
+          @attribute name the name of the link
+          @attribute title optional title of the link
+  */
+
+  Link implements PageContentElement  = "->" Name (title:String)? ";";
+
+//*********************Picture*******************************************//
+   /** A ASTPicture represent a picture in a website
+            @attribute name the name of the picture
+            @attribute width width of the picture
+            @attribute height height of the picture
+   */
+
+  Picture implements PageContentElement = "pic"  Name  (width:SignedNatLiteral) "x" (height:SignedNatLiteral) ";";
+
+ //*********************Paragraph*******************************************//
+     /** A ASTParagraph represent a paragraph in a website
+              @attribute the text of the paragraph
+     */
+
+    Paragraph implements PageContentElement = text:String ";";
+
+ //*********************TextBlock*******************************************//
+      /** A ASTTextBlock represents a block with text in a website
+               @attribute the text and title of the textblock
+      */
+
+     TextBlock implements PageContentElement = "textBlock" "{" title:String  (Paragraph)* "}";
+
+ //*********************CodeBlock*******************************************//
+      /** A ASTCodeBlock represent block of code with black background and white font color
+               @attribute text the text of the paragraph
+      */
+
+     CodeBlock implements PageContentElement = "codeBlock" "{" (Paragraph)* "}";
+
+ //*********************Aside*******************************************//
+      /** A ASTPageContentElement represent a sub element on the right side of the website
+               @attribute content of aside
+      */
+
+     Aside implements PageContentElement = "aside" "{" (subItem:PageContentElement)+ "}";
+
+//*********************Row*******************************************//
+      /** A ASTPageContentElement represents elements to be shown in a row of the website
+               @attribute content of row
+      */
+
+     Row implements PageContentElement = "row" "{" (PageContentElement)+ "}" ;
+
+//*********************LandImage*******************************************//
+      /** A ASTLandImage represents the image and text to be shown in the first opening of the website
+                     @attribute text and image to be displayed
+      */
+
+    LandImage implements PageContentElement = "landImage" "{" title:String ";" subtitle:String ";" picture:String "}" ;
+
+//*********************Card*******************************************//
+      /** A ASTCard represents a small box with content to be clicked on to get to main page for topic
+                     @attribute text and image to be displayed
+      */
+
+    Card implements PageContentElement = "card" "{" title:String  picture:String Paragraph link:String "}" ;
+
+//*********************Table*******************************************//
+      /** A ASTTable represents a table from a csv file to be displayed
+                     @attribute title and csv file path to table
+      */
+    Table implements PageContentElement = "table" title:String fileName:String ";" ;
+
+
+}
