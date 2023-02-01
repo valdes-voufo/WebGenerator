@@ -1,75 +1,119 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
-    plugins {
-        id 'java'
-        id 'monticore' version "$mc_version"
-        id 'com.github.johnrengelman.shadow' version '6.0.0'
-        id 'maven-publish'
-    }
-
-allprojects {
-
-    group 'de.monticore'
-    buildDir = "$projectDir/target"
+/* (c) https://github.com/MontiCore/monticore */
+plugins {
+    id "java"
+    id "monticore" version "$mc_version" // MontiCore Plugin
+    id "maven-publish"
+    id "com.github.johnrengelman.shadow" version "6.0.0"
+    // useful reports
+    // todo: reactivate this plugin when new version compatible to gradle 6.0.1 is available
+//    id 'cz.malohlava.visteg' version '1.0.5'
+    id 'jacoco'
+}
 
 
+def guava_version = '30.0-jre'
+def findbugs_version = '3.0.0'
+def antlr_version = '4.7.1'
+def junit_version = '4.13.1'
 
+def grammarDir = 'src/main/grammars/com/valdes'
 
-    repositories {
-        if (("true").equals(getProperty('useLocalRepo'))) {
-            mavenLocal()
+group = "de.monticore.lang"
+version = '7.5.0-SNAPSHOT'
+description = "Website DSL"
+sourceCompatibility = "11"
+
+buildDir = file("$projectDir/target")
+
+// configure non-standard source sets
+sourceSets {
+    main.java.srcDirs += ["$projectDir/target/generated-sources/monticore/sourcecode/"]
+    grammars {
+        resources {
+            srcDirs([grammarDir])
+            include "**/*.mc4"
         }
-        maven {
-            credentials.username mavenUser
-            credentials.password mavenPassword
-            url repo
-        }
-        mavenCentral()
     }
 }
 
-subprojects {
-
-    test {
-        useJUnit()
-
-        testLogging {
-            // controls whether test output is shown
-            showStandardStreams = !("false").equals(getProperty('showTestOutput'))
-            showExceptions true
-            showCauses true
-            showStackTraces true
-            exceptionFormat TestExceptionFormat.FULL
-            info {
-                events TestLogEvent.FAILED,
-                        TestLogEvent.PASSED,
-                        TestLogEvent.SKIPPED,
-                        TestLogEvent.STANDARD_OUT
-            }
-        }
-        afterTest { desc, result ->
-            logger.lifecycle "${desc.className} > ${desc.name} ${result.resultType}"
-        }
-        afterSuite { desc, result ->
-            if (!desc.parent) { // will match the outermost suite
-                def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-                def startItem = '|  ', endItem = '  |'
-                logger.lifecycle startItem + output + endItem
-            }
-        }
-        reports {
-            junitXml.required = false
-            html.required = false
-        }
+java {
+    registerFeature('grammars') {
+        usingSourceSet(sourceSets.grammars)
     }
-
 }
 
-publishing {
+dependencies {
+    implementation "de.monticore:monticore-runtime:$mc_version"
+    implementation "de.monticore:monticore-grammar:$mc_version"
+    grammar("de.monticore:monticore-grammar:$mc_version") {
+        capabilities {
+            requireCapability("de.monticore:monticore-grammar-grammars")
+        }
+    }
+    implementation "de.se_rwth.commons:se-commons-logging:$se_commons_version"
+    implementation "de.se_rwth.commons:se-commons-utilities:$se_commons_version"
+    implementation group: 'com.google.guava', name: 'guava', version: guava_version
+    implementation group: 'de.monticore.lang', name: 'cd4analysis', version: mc_version
+    implementation group: 'org.antlr', name: 'antlr4-runtime', version: antlr_version
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    testImplementation group: 'junit', name: 'junit', version: junit_version
+    testImplementation("de.monticore:monticore-runtime:$mc_version") {
+        capabilities {
+            requireCapability("de.monticore:monticore-runtime-tests")
+        }
+    }
+}
+
+// has to be placed directly under the dependency definition, since otherwise the grammar configurations are not found
+repositories {
+    if (("true").equals(getProperty('useLocalRepo'))) {
+        mavenLocal()
+    }
+    maven {
+        credentials.username mavenUser
+        credentials.password mavenPassword
+        url repo
+    }
+}
+
+
+tasks.register('generateWebsite', MCTask) {
+    grammar = file "$grammarDir/Website.mc4"
+    outputDir = file "$buildDir/generated-sources/monticore/sourcecode/"
+    def uptoDate = incCheck("Website.mc4")
+    outputs.upToDateWhen { uptoDate }
+}
+
+compileJava {
+    dependsOn project.collect { it.tasks.withType(MCTask) }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+sourcesJar.dependsOn project.collect { it.tasks.withType(MCTask) }
+
+// generated java doc contains errors, disable for now
+javadoc.failOnError(false)
+
+shadowJar { // all in one jar
+    manifest {
+        attributes "Main-Class": "website.WebsiteTool"
+    }
+    archiveClassifier = "tool"
+}
+
+jar.dependsOn(shadowJar)
+
+// configure deployment
+/*publishing {
+    // configure what artifacts to publish
     publications {
-        maven(MavenPublication) {
-            from(components.java)
+        mavenJava(MavenPublication) {
+            artifactId = "$project.name"
+            from components.java
         }
     }
     repositories.maven {
@@ -77,6 +121,23 @@ publishing {
         credentials.password mavenPassword
         def releasesRepoUrl = "https://nexus.se.rwth-aachen.de/content/repositories/monticore-releases/"
         def snapshotsRepoUrl = "https://nexus.se.rwth-aachen.de/content/repositories/monticore-snapshots/"
-        url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        url = version.endsWith("SNAPSHOT") ? snapshotsRepoUrl : releasesRepoUrl
     }
+}*/
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
 }
+
+tasks.register('testReport', TestReport) {
+    destinationDir = file("$buildDir/reports/allTests")
+    // Include the results from the 'test' task
+    reportOn tasks.withType(Test)
+}
+
+
+tasks.register('buildAll', GradleBuild) {
+    tasks = ['build']
+}
+
+defaultTasks 'build'

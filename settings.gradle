@@ -1,18 +1,17 @@
+/* (c) https://github.com/MontiCore/monticore */
 pluginManagement {
-    repositories {
-        mavenCentral()
-        if(("true").equals(getProperty('useLocalRepo'))){
-            mavenLocal()
-        }
-        maven {
-            credentials.username mavenUser
-            credentials.password mavenPassword
-            url repo
-        }
-
-        gradlePluginPortal()
+  repositories {
+    if(("true").equals(getProperty('useLocalRepo'))){
+      mavenLocal()
     }
+    maven {
+      credentials.username mavenUser
+      credentials.password mavenPassword
+      url repo
+    }
+    gradlePluginPortal()
+  }
 }
+rootProject.name = 'automaton'
 
-rootProject.name = 'MC-Tutorial'
-include(':website')
+include(':gentest')

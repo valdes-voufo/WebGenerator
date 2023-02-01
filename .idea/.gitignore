@@ -6,3 +6,17 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+target
+nppBackup
+.project
+.settings
+.classpath
+.idea
+.git
+
+.gradle
+*.iml
+
+gradlew.bat
+gradlew
+gradle
